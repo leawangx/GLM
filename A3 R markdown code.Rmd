@@ -1,0 +1,94 @@
+---
+title: "A3"
+author: "Xinrui Wang 1004741078"
+date: "2021/7/22"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Q1
+1. Y Poisson distribution
+a) P (Y = 0) = 0.5 -> e^(-lambda)=0.5 --> lambda=-log(0.5)
+in poisson distribution, mean = variance = lambda =
+```{r}
+-log(0.5)
+```
+b)P(X=3)=
+```{r}
+dpois(3,-log(0.5))
+```
+2. est P(H) = pi, x=9,n=15,x/n=0.6
+a) Bin(n=15,theta=0.5) 
+pdf:f(x|theta)=theta^x*(1-theta)^x
+L(theta|x=9)=theta^9*(1-theta)^6
+
+b)
+```{r}
+likelihood=function(n,y,theta){return(theta^y*(1-theta)^(n-y))}
+theta=seq(0.01,1,0.01)
+plot(theta,likelihood(15,9,theta),type = "l",ylab="Likelihood")
+
+loglike=function(n,y,theta){return(y*log(theta)+(n-y)*log(1-theta))}
+plot(loglike(15,9,theta)~theta,type="l", ylab="Log Likelihood")
+abline(v=0.6)
+```
+MLE pi=
+```{r}
+which.max(loglike(15,9,theta))*0.01
+```
+
+
+## Q2
+a)
+```{r}
+x<-seq(3,12,1)
+pi<-c(0.03,0.06,0.12,0.23,0.4,0.6,0.77,0.88,0.94,0.97)
+plot(pi~x)
+```
+not linear
+
+b)
+```{r}
+plot(log(pi)~x)
+```
+not linear
+
+c)
+```{r}
+logitpi<-pi/(1-pi)
+plot(logitpi~x)
+cor(x,logitpi)
+```
+not linear
+d) none of the models above is linear though,   a) looks best fit the data 
+```{r}
+plot(glm(logitpi~x))
+```
+
+## Q3
+```{r}
+d=c(45,15,40,83,90,25,35,65,95,35,75,45,50,75,30,25,20,60,70,30,60,61,65,15,20,45,15,25, 15,30,40,15,135,20,40)
+y=c(0,0,1,1,1,1,1,1,1,1,1,1,0,1,0,1,0,1,1,1,1,0,1,0,0,1,0,1,0,1,1,0,1,0,0)
+```
+a)
+```{r}
+model<-glm(y~d,family=binomial)
+summary(model)
+```
+logit=-2.21+0.07*d
+It means the sore threat on walking will increase by 0.0703 as the minute increase by 1.
+
+b)
+```{r}
+exp(-2.21358+0.07038*1)/(1+exp(-2.21356+0.07038*1))
+```
+c)
+```{r}
+library(lmtest)
+lrtest(model)
+```
+the possibility (p-value) is 0.0004 smaller than 0.05, we will reject null hypothesis:restricted model is good.
+so unrestricted model is good.
